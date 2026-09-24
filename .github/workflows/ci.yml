@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# CI only reads the code: it publishes nothing and needs no secrets, which is also
+# what makes it safe to run on pull requests from forks.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The development toolchain (vitest 5) needs Node 22.12+; the published
+        # package supports Node 20, which the `runtime` job below checks.
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      # Includes the manifest checks: server.json against package.json and the code.
+      - run: npm test
+      - run: npm run build
+      # What npm would ship: the executable with its shebang, nothing from the repository.
+      - run: npm run verify:package
+      # The built server must answer the handshake over stdio with no credentials.
+      - run: npm run smoke
+      - if: matrix.node == 22
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
+
+  runtime:
+    name: Runs on Node 20
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: npm
+      # Production dependencies only: exactly what `npx @factuarea/mcp` installs.
+      # engine-strict (.npmrc) would otherwise reject the omitted dev toolchain,
+      # which needs Node 22; users never install it.
+      - run: npm ci --omit=dev --ignore-scripts --engine-strict=false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dist
+          path: dist
+      - run: npm run smoke
+
+  manifest:
+    name: Registry manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: ./.github/actions/setup-mcp-publisher
+      # The registry's own schema and rules, so a bad manifest fails here and not
+      # halfway through a release, after npm has already published.
+      - run: mcp-publisher validate

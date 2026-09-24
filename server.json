@@ -1,0 +1,67 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.factuarea/mcp",
+  "title": "Factuarea",
+  "description": "Spanish invoicing with VeriFactu (AEAT): invoices, quotes, contacts, products, taxes and filings.",
+  "version": "0.1.0",
+  "websiteUrl": "https://docs.factuarea.com/mcp",
+  "repository": {
+    "url": "https://github.com/factuarea/factuarea-mcp",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://docs.factuarea.com/logo/isotipo-factuarea.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"],
+      "theme": "light"
+    },
+    {
+      "src": "https://docs.factuarea.com/logo/isotipo-factuarea-dark.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"],
+      "theme": "dark"
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.factuarea.com"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@factuarea/mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "FACTUAREA_API_KEY",
+          "description": "Factuarea API key. The prefix selects the environment: fact_test_ for the isolated sandbox, fact_live_ for the real company. Without it the server starts and refuses every call with an actionable error.",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "FACTUAREA_MCP_URL",
+          "description": "Endpoint of the hosted server. Defaults to https://mcp.factuarea.com.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "FACTUAREA_REQUEST_TIMEOUT_MS",
+          "description": "Ceiling for a single call, in milliseconds. Defaults to 120000.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "privacyPolicyUrl": "https://factuarea.com/privacidad"
+    }
+  }
+}

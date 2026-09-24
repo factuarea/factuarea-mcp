@@ -1,0 +1,57 @@
+name: Bug report
+description: A tool, the connection or the local server does not behave as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. **Never paste an API key or customer data** — replace them with placeholders.
+        Reproducing with a `fact_test_` key (the sandbox) is the safest way to share details.
+  - type: dropdown
+    id: connection
+    attributes:
+      label: How are you connected?
+      options:
+        - Hosted server over OAuth (https://mcp.factuarea.com)
+        - Hosted server with an API key header
+        - Local stdio server (npx @factuarea/mcp)
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: MCP client and version
+      placeholder: Claude Desktop 1.x, Cursor 2.x, VS Code 1.x, ChatGPT…
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - test (fact_test_ key or Test on the consent screen)
+        - live
+    validations:
+      required: true
+  - type: input
+    id: tool
+    attributes:
+      label: Tool, prompt or resource involved
+      placeholder: create_invoice
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you asked for, what the server returned (include the error `code` and `data` if there was one), and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The arguments sent, with identifiers and personal data replaced.
+  - type: input
+    id: version
+    attributes:
+      label: '@factuarea/mcp version (local server only)'
+      placeholder: 'npx @factuarea/mcp --version'

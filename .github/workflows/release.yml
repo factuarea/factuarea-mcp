@@ -1,0 +1,102 @@
+name: Release
+
+# Release pipeline for @factuarea/mcp and its MCP Registry entry.
+#
+# Flow (Changesets + npm Trusted Publishing + MCP Registry):
+#   1. Pull requests that change the package carry a changeset (.changeset/*.md).
+#   2. On merge to main, changesets/action opens or updates the "Version Packages"
+#      pull request: it applies the bumps, rewrites CHANGELOG.md and package.json,
+#      and keeps server.json on the same version (`npm run version`).
+#   3. Merging THAT pull request leaves no changesets pending, so this workflow
+#      publishes to npm through OIDC Trusted Publishing — no long-lived NPM_TOKEN —
+#      with build provenance, and then announces the version to the MCP Registry
+#      as com.factuarea/mcp, authenticated by the DNS record on factuarea.com.
+#
+# One-time setup (npm Trusted Publisher, DNS key, MCP_REGISTRY_PRIVATE_KEY secret)
+# is described in CONTRIBUTING.md → Releases.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # push the Version Packages branch and create tags and releases
+  pull-requests: write # open and update the Version Packages pull request
+  id-token: write # OIDC token for npm Trusted Publishing and provenance
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0 # changesets needs the history for changelog links
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      # Trusted Publishing needs npm >= 11.5.1; setup-node ships an older one.
+      - name: Use an npm that supports Trusted Publishing
+        run: npm install -g npm@^11.5.1
+
+      - run: npm ci
+
+      # Publish only what passes: a green CI run on an earlier commit says nothing
+      # about the commit being released.
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm run verify:package
+      - run: npm run smoke
+
+      - uses: ./.github/actions/setup-mcp-publisher
+      - name: Validate the registry manifest before anything is published
+        run: mcp-publisher validate
+
+      - name: Create the Version Packages pull request, or publish to npm
+        id: changesets
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        with:
+          version: npm run version
+          publish: npm run release
+          commit: 'chore(release): version packages'
+          title: 'chore(release): version packages'
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # No NPM_TOKEN: `npm publish` authenticates through OIDC when the package
+          # has a Trusted Publisher configured on npmjs.com.
+          NPM_CONFIG_PROVENANCE: 'true'
+
+      - name: Announce the release to the MCP Registry
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          MCP_REGISTRY_PRIVATE_KEY: ${{ secrets.MCP_REGISTRY_PRIVATE_KEY }}
+        run: |
+          mcp-publisher login dns --domain factuarea.com --private-key "$MCP_REGISTRY_PRIVATE_KEY"
+          # The registry checks the `mcpName` of the npm version it is told about,
+          # and a version npm has just accepted can take a moment to be readable.
+          for attempt in 1 2 3 4 5; do
+            if mcp-publisher publish; then exit 0; fi
+            echo "Registry publish failed (attempt $attempt); retrying…"
+            sleep $((attempt * 15))
+          done
+          exit 1
+
+      - name: Explain a failed release
+        if: failure()
+        run: |
+          echo "::error::The release failed. If npm rejected the publish, the npm Trusted Publisher"
+          echo "::error::for @factuarea/mcp is missing (owner factuarea, repo factuarea-mcp, workflow release.yml)."
+          echo "::error::If only the registry step failed, npm already has the version: fix the DNS key or the"
+          echo "::error::MCP_REGISTRY_PRIVATE_KEY secret and run 'mcp-publisher publish' by hand. See CONTRIBUTING.md."

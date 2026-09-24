@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/factuarea/factuarea-mcp/blob/main/SECURITY.md
+    about: Please report security problems privately, not in a public issue.
+  - name: Account, billing or product support
+    url: https://docs.factuarea.com/support
+    about: Questions about your Factuarea account go to support, not to this repository.
+  - name: MCP documentation
+    url: https://docs.factuarea.com/mcp
+    about: Connecting a client, authentication, scopes, the tool catalog and error codes.
