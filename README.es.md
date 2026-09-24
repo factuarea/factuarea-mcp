@@ -1,8 +1,8 @@
 <p align="center">
   <a href="https://factuarea.com">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://docs.factuarea.com/logo/factuarea-logo-dark.svg">
-      <img src="https://docs.factuarea.com/logo/factuarea-logo.svg" alt="Factuarea" width="260">
+      <source media="(prefers-color-scheme: dark)" srcset="https://docs.factuarea.com/logo/isotipo-factuarea-dark.svg">
+      <img src="https://docs.factuarea.com/logo/isotipo-factuarea.svg" alt="Factuarea" width="88" height="88">
     </picture>
   </a>
 </p>
@@ -34,9 +34,9 @@
 
 ---
 
-| +450  |    29    |       9        |       5        |            2             |
-| :---: | :------: | :------------: | :------------: | :----------------------: |
-| tools | dominios | guías fiscales | flujos guiados | entornos: real y sandbox |
+<p align="center">
+  <strong>+450</strong> tools · <strong>29</strong> dominios · <strong>9</strong> guías fiscales · <strong>5</strong> flujos guiados · entornos <strong>real</strong> y <strong>sandbox</strong>
+</p>
 
 [Factuarea](https://factuarea.com) es una plataforma de facturación y gestión para empresas y
 autónomos en España. Este es su servidor oficial de

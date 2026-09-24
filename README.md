@@ -1,8 +1,8 @@
 <p align="center">
   <a href="https://factuarea.com">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://docs.factuarea.com/logo/factuarea-logo-dark.svg">
-      <img src="https://docs.factuarea.com/logo/factuarea-logo.svg" alt="Factuarea" width="260">
+      <source media="(prefers-color-scheme: dark)" srcset="https://docs.factuarea.com/logo/isotipo-factuarea-dark.svg">
+      <img src="https://docs.factuarea.com/logo/isotipo-factuarea.svg" alt="Factuarea" width="88" height="88">
     </picture>
   </a>
 </p>
@@ -34,9 +34,9 @@
 
 ---
 
-| 450+  |   29    |         9         |        5         |               2                |
-| :---: | :-----: | :---------------: | :--------------: | :----------------------------: |
-| tools | domains | fiscal guardrails | guided workflows | environments: live and sandbox |
+<p align="center">
+  <strong>450+</strong> tools · <strong>29</strong> domains · <strong>9</strong> fiscal guardrails · <strong>5</strong> guided workflows · <strong>live</strong> and <strong>sandbox</strong> environments
+</p>
 
 [Factuarea](https://factuarea.com) is an invoicing and management platform for businesses
 and freelancers in Spain. This is its official
