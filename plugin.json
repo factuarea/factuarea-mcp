@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "factuarea-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Spanish invoicing with VeriFactu (AEAT) for AI agents: invoices and rectificativas, quotes, delivery notes, purchases, contacts, products, taxes and tax filings. Hosted MCP server at https://mcp.factuarea.com (Streamable HTTP + OAuth 2.1 or API key), or local stdio via npm.",
   "author": {
     "name": "Factuarea",
@@ -25,7 +25,9 @@
           "transport": "stdio",
           "command": "npx",
           "args": ["-y", "@factuarea/mcp"],
-          "env": { "FACTUAREA_API_KEY": "fact_test_…" }
+          "env": {
+            "FACTUAREA_API_KEY": "fact_test_…"
+          }
         }
       ]
     },

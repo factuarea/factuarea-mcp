@@ -3,7 +3,7 @@
   "name": "com.factuarea/mcp",
   "title": "Factuarea",
   "description": "Spanish invoicing with VeriFactu (AEAT): invoices, quotes, contacts, products, taxes and filings.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "websiteUrl": "https://docs.factuarea.com/mcp",
   "repository": {
     "url": "https://github.com/factuarea/factuarea-mcp",
@@ -33,7 +33,7 @@
     {
       "registryType": "npm",
       "identifier": "@factuarea/mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       },

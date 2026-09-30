@@ -1,6 +1,6 @@
 {
   "name": "@factuarea/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local stdio bridge to the hosted Factuarea MCP server: Spanish invoicing, VeriFactu (AEAT), quotes, contacts, products and taxes as tools for AI agents.",
   "mcpName": "com.factuarea/mcp",
   "type": "module",
