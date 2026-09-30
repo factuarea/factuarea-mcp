@@ -23,7 +23,7 @@
   <a href="https://www.npmjs.com/package/@factuarea/mcp"><img src="https://img.shields.io/npm/v/@factuarea/mcp?color=465FFF&label=npm" alt="npm"></a>
   <a href="https://github.com/factuarea/factuarea-mcp/actions/workflows/ci.yml"><img src="https://github.com/factuarea/factuarea-mcp/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://registry.modelcontextprotocol.io/v0/servers?search=com.factuarea/mcp"><img src="https://img.shields.io/badge/MCP_Registry-com.factuarea%2Fmcp-465FFF" alt="MCP Registry"></a>
-  <a href="https://docs.factuarea.com/es/mcp/tools"><img src="https://img.shields.io/badge/tools-450%2B-465FFF" alt="Más de 450 tools"></a>
+  <a href="https://docs.factuarea.com/es/mcp/tools"><img src="https://img.shields.io/badge/tools-550%2B-465FFF" alt="Más de 550 tools"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licencia-MIT-465FFF" alt="Licencia MIT"></a>
 </p>
 
@@ -35,7 +35,7 @@
 ---
 
 <p align="center">
-  <strong>+450</strong> tools · <strong>29</strong> dominios · <strong>9</strong> guías fiscales · <strong>5</strong> flujos guiados · entornos <strong>real</strong> y <strong>sandbox</strong>
+  <strong>+550</strong> tools · <strong>35</strong> dominios · <strong>9</strong> guías fiscales · <strong>5</strong> flujos guiados · entornos <strong>real</strong> y <strong>sandbox</strong>
 </p>
 
 [Factuarea](https://factuarea.com) es una plataforma de facturación y gestión para empresas y
@@ -131,18 +131,21 @@ versiones se publican desde CI con [procedencia de npm](https://docs.npmjs.com/g
 > _«¿Por qué el pedido #1042 de WooCommerce no generó factura?»_
 >
 > _«¿Quién del equipo no ha fichado hoy?»_
+>
+> _«Crea una tarea en el proyecto DEV para mañana y asígnasela a Ana.»_
 
 ## Qué cubre
 
-|                       |                                                                                                                                                                                        |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🧾 **Ventas**         | Facturas de borrador a cobrada — envío, programación, recordatorios, cobros, anulación y rectificativas — además de presupuestos, proformas, albaranes firmados y facturas recurrentes |
-| 📥 **Compras**        | Facturas de proveedor con adjuntos, pagos y listados de pendientes y vencidas                                                                                                          |
-| 📦 **Catálogo**       | Contactos que son clientes, proveedores o ambos; productos con variantes, presentaciones y stock; ofertas de proveedor; tarifas; series de numeración; impuestos                       |
-| 🏛️ **Cumplimiento**   | Registros, eventos y certificados de VeriFactu; FacturaE a administraciones públicas a través de FACe; modelos 303, 347 y 130                                                          |
-| ⏱️ **Equipo**         | Empleados, horarios, el registro de jornada del RD-ley 8/2019, ausencias, presencia y festivos                                                                                         |
-| ⚙️ **Automatización** | Webhooks y eventos, un motor de reglas con simulación, tiendas WooCommerce y Shopify, autofacturación de Stripe                                                                        |
-| 🏢 **Gestorías**      | Empresas gestionadas, API keys, registros de emails y de peticiones                                                                                                                    |
+|                           |                                                                                                                                                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧾 **Ventas**             | Facturas de borrador a cobrada — envío, programación, recordatorios, cobros, anulación y rectificativas — además de presupuestos, proformas, albaranes firmados y facturas recurrentes                                    |
+| 📥 **Compras**            | Facturas de proveedor con adjuntos, pagos y listados de pendientes y vencidas                                                                                                                                             |
+| 📦 **Catálogo**           | Contactos que son clientes, proveedores o ambos; productos con variantes, presentaciones y stock; ofertas de proveedor; tarifas; series de numeración; impuestos                                                          |
+| 🏛️ **Cumplimiento**       | Registros, eventos y certificados de VeriFactu; FacturaE a administraciones públicas a través de FACe; modelos 303, 347 y 130                                                                                             |
+| ⏱️ **Equipo**             | Empleados, horarios, el registro de jornada del RD-ley 8/2019, ausencias, presencia y festivos                                                                                                                            |
+| ✅ **Tareas y proyectos** | Proyectos con columnas de tablero y campos personalizados; tareas con responsables, etiquetas, comentarios, adjuntos y subtareas; temporizadores y entradas de tiempo que puedes facturar; la agenda y las notificaciones |
+| ⚙️ **Automatización**     | Webhooks y eventos, un motor de reglas con simulación, tiendas WooCommerce y Shopify, autofacturación de Stripe                                                                                                           |
+| 🏢 **Gestorías**          | Empresas gestionadas, API keys, registros de emails y de peticiones                                                                                                                                                       |
 
 Cada herramienta, su dominio y el permiso que necesita: **[docs.factuarea.com/es/mcp/tools](https://docs.factuarea.com/es/mcp/tools)**.
 
