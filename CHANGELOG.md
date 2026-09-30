@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- [#3](https://github.com/factuarea/factuarea-mcp/pull/3) [`a390bda`](https://github.com/factuarea/factuarea-mcp/commit/a390bdaaeefb0aebe48afb0185e34d4b990bb6f7) Thanks [@Chelu97](https://github.com/Chelu97)! - Update the README in English and Spanish for the new tasks and projects tools: the tool and domain counts, a "Tasks & projects" row in "What it covers" and an example request.
+
 ## 0.1.0
 
 First release.
