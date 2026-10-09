@@ -10,6 +10,8 @@ const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as {
   name: string;
   version: string;
   mcpName: string;
+  files: string[];
+  exports: Record<string, { types: string; import: string }>;
 };
 
 interface EnvironmentVariable {
@@ -103,5 +105,25 @@ describe('plugin.json', () => {
 
     expect(remote).toMatchObject({ transport: 'streamable-http', url: DEFAULT_MCP_URL });
     expect(local).toMatchObject({ transport: 'stdio', command: 'npx', args: ['-y', pkg.name] });
+  });
+});
+
+describe('portable CRM delivery', () => {
+  it('connects the host to the existing remote endpoint without embedding credentials', () => {
+    const config = JSON.parse(readFileSync('mcp.json', 'utf8')) as Record<string, unknown>;
+    expect(config).toEqual({
+      $schema: 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json',
+      mcpServers: { factuarea: { type: 'streamable-http', url: DEFAULT_MCP_URL } },
+    });
+  });
+
+  it('ships the standard plugin files and a typed discovery entry point', () => {
+    expect(pkg.files).toEqual(expect.arrayContaining(['dist', 'plugin.json', 'mcp.json', 'skills', 'README.es.md']));
+    expect(pkg.exports['./discovery']).toEqual({
+      types: './dist/discovery.d.ts',
+      import: './dist/discovery.js',
+    });
+    const skill = readFileSync('skills/crm/SKILL.md', 'utf8');
+    expect(skill).toMatch(/^---\nname: crm\ndescription: .+\n---\n/);
   });
 });

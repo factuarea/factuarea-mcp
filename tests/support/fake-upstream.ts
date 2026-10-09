@@ -65,6 +65,8 @@ export interface FakeUpstreamOptions {
   apiKey?: string;
   capabilities?: ServerCapabilities;
   instructions?: string;
+  listTools?: (params: Record<string, unknown>) => Record<string, unknown>;
+  callTool?: (params: { name: string; arguments?: Record<string, unknown> }) => Record<string, unknown>;
 }
 
 /**
@@ -111,7 +113,7 @@ export async function startFakeUpstream(options: FakeUpstreamOptions = {}): Prom
       return;
     }
 
-    const server = buildServer(capabilities, options.instructions);
+    const server = buildServer(capabilities, options);
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
     res.on('close', () => {
       void transport.close();
@@ -135,20 +137,27 @@ export async function startFakeUpstream(options: FakeUpstreamOptions = {}): Prom
   };
 }
 
-function buildServer(capabilities: ServerCapabilities, instructions: string | undefined): Server {
+function buildServer(capabilities: ServerCapabilities, options: FakeUpstreamOptions): Server {
+  const { instructions } = options;
   const server = new Server(
     { name: 'factuarea-public', version: '1.0.0' },
     { capabilities, ...(instructions && { instructions }) },
   );
 
   if (capabilities.tools) {
-    server.setRequestHandler(ListToolsRequestSchema, (request) =>
-      request.params?.cursor === 'page-2'
-        ? { tools: [DELETE_INVOICE_TOOL] }
-        : { tools: [SEARCH_INVOICES_TOOL], nextCursor: 'page-2' },
+    const listSchema = ListToolsRequestSchema.extend({
+      params: ListToolsRequestSchema.shape.params.unwrap().loose().optional(),
+    });
+    server.setRequestHandler(listSchema, (request) =>
+      options.listTools
+        ? options.listTools(request.params ?? {})
+        : request.params?.cursor === 'page-2'
+          ? { tools: [DELETE_INVOICE_TOOL] }
+          : { tools: [SEARCH_INVOICES_TOOL], nextCursor: 'page-2' },
     );
 
     server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
+      if (options.callTool) return options.callTool(request.params);
       const { name, arguments: args = {} } = request.params;
       switch (name) {
         case 'search_invoices':

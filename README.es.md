@@ -59,7 +59,7 @@ concedes.
 | **ChatGPT**                   | Añade un conector personalizado (modo desarrollador) con la URL y OAuth                                                                                                             |
 | **Cursor**                    | El botón _Add to Cursor_, o `{ "mcpServers": { "factuarea": { "url": "https://mcp.factuarea.com" } } }` en `~/.cursor/mcp.json`                                                     |
 | **VS Code**                   | El botón _Instalar_, o `{ "servers": { "factuarea": { "type": "http", "url": "https://mcp.factuarea.com" } } }` en `.vscode/mcp.json`                                               |
-| **Cualquier otro cliente**    | Streamable HTTP con OAuth 2.1 (registro dinámico de clientes y PKCE)                                                                                                                |
+| **Cualquier otro cliente**    | Streamable HTTP con OAuth 2.1, PKCE y los requisitos de registro o metadatos de cliente anunciados por el servidor de autorización                                                  |
 
 El acceso MCP está **incluido en todos los planes de Factuarea**, también durante la prueba.
 
@@ -113,6 +113,45 @@ son siempre los del servidor, así que la conexión local y la remota se comport
 versiones se publican desde CI con [procedencia de npm](https://docs.npmjs.com/generating-provenance-statements).
 
 </details>
+
+## Plugin CRM y descubrimiento de herramientas
+
+El paquete incluye un [manifiesto de plugin](plugin.json), una [configuración MCP remota](mcp.json)
+y una [skill CRM](skills/crm/SKILL.md). Un host compatible se conecta al servidor
+Factuarea existente y gestiona el consentimiento OAuth, las credenciales del cliente,
+el almacenamiento de tokens y su renovación. Los hosts que utilicen metadatos de cliente
+o `private_key_jwt` deben cumplir los requisitos anunciados por el servidor de autorización.
+El puente stdio continúa utilizando una API key.
+
+La skill CRM cubre personas de contacto, leads y pipelines **cuando sus herramientas
+canónicas aparecen en el catálogo de la conexión**. La disponibilidad depende de la
+empresa, el plan, el despliegue y los permisos de la credencial. Consulta los esquemas
+anunciados antes de actuar y no registra alias ni inicia sincronizaciones. Sigue el
+[recorrido CRM](skills/crm/references/journey.md) para consultar un prospecto y preparar
+un cambio autorizado.
+
+Con un cliente JavaScript del SDK MCP que ya esté conectado:
+
+```ts
+import { discoverTools } from '@factuarea/mcp/discovery';
+
+const tools = await discoverTools(client, {
+  requestOptions: { signal: abortController.signal, timeout: 30_000 },
+});
+```
+
+La función sigue todos los `nextCursor` opacos, conserva los esquemas y metadatos
+nativos y elimina nombres duplicados conservando el descriptor más reciente. Comienza
+de nuevo en cada llamada y propaga los errores nativos sin devolver un catálogo parcial.
+La opción `perPage` reenvía el parámetro `per_page` del servidor; si se omite, utiliza
+el valor configurado en el servidor. Los cursores permanecen en la misma identidad de
+cliente. El descubrimiento no garantiza una instantánea atómica ni concede autorización
+para ejecutar: el servidor comprueba de nuevo cada llamada posterior.
+
+Las pruebas locales utilizan un upstream aislado. Verifican el transporte, la paginación,
+los envelopes CRM nativos y la conservación de errores; no demuestran disponibilidad
+en un despliegue, aislamiento entre empresas ni el flujo OAuth y la renovación de
+credenciales de un host real.
 
 ## Pídele cosas como
 

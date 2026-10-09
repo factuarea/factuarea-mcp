@@ -7,10 +7,20 @@
   "bin": {
     "factuarea-mcp": "dist/index.js"
   },
+  "exports": {
+    "./discovery": {
+      "types": "./dist/discovery.d.ts",
+      "import": "./dist/discovery.js"
+    }
+  },
   "files": [
     "dist",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "README.es.md",
+    "plugin.json",
+    "mcp.json",
+    "skills"
   ],
   "engines": {
     "node": ">=20"
