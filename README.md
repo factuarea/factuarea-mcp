@@ -144,6 +144,28 @@ forwards the server's `per_page` parameter; omitting it uses the server's config
 default. Cursors stay on the same client identity. Discovery is not an atomic snapshot
 or an execution grant: the server checks each subsequent call again.
 
+`@factuarea/mcp/crm` adds typed knowledge and help center calls. Use
+`discoverCrmApplicability` to read the current descriptors and `callCrmTool` to
+rediscover and forward one canonical call with your exact arguments. Missing tools
+raise `CrmToolUnavailableError`. The full catalog remains available, including the
+existing contact people, lead and pipeline tools.
+
+```ts
+import { callCrmTool, recoverCrmReceipt } from '@factuarea/mcp/crm';
+
+const result = await callCrmTool(client, 'get_knowledge_article', { id: articleId });
+// After an uncertain write outcome, explicitly read its original receipt:
+const receipt = await recoverCrmReceipt(client, originalWrite);
+```
+
+Keep `originalWrite` as the immutable original `{ name, arguments }` intent on the
+same connection. Recovery sends only its original `idempotency_key`; it requires the
+original operation's current permission even though it is readonly. Set `confirmed`
+only after human authorization of the concrete write. The wrappers preserve native
+schemas, extensions, omitted fields, explicit nulls, original versions and field masks.
+They do not generate keys, retry writes or recover receipts automatically. Results
+retain native MCP content; the exported output types describe its JSON data envelope.
+
 Local tests use an isolated fake upstream. They verify transport, pagination, native
 CRM envelopes and error preservation; they do not prove deployment availability,
 tenant enforcement or a real host's OAuth credential/refresh flow.

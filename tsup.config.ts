@@ -4,7 +4,7 @@ import { defineConfig } from 'tsup';
 const { version } = JSON.parse(readFileSync('./package.json', 'utf8')) as { version: string };
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/discovery.ts'],
+  entry: ['src/index.ts', 'src/discovery.ts', 'src/crm.ts'],
   dts: true,
   format: ['esm'],
   target: 'node20',

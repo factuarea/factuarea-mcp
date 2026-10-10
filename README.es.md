@@ -148,6 +148,29 @@ el valor configurado en el servidor. Los cursores permanecen en la misma identid
 cliente. El descubrimiento no garantiza una instantánea atómica ni concede autorización
 para ejecutar: el servidor comprueba de nuevo cada llamada posterior.
 
+`@factuarea/mcp/crm` añade llamadas tipadas de conocimiento y centros de ayuda. Usa
+`discoverCrmApplicability` para consultar los descriptores actuales y `callCrmTool`
+para redescubrir y reenviar una llamada canónica con tus argumentos exactos. Una
+herramienta ausente produce `CrmToolUnavailableError`. El catálogo completo sigue
+disponible, incluidas las herramientas existentes de personas de contacto, leads y pipelines.
+
+```ts
+import { callCrmTool, recoverCrmReceipt } from '@factuarea/mcp/crm';
+
+const result = await callCrmTool(client, 'get_knowledge_article', { id: articleId });
+// Tras un resultado incierto de escritura, consulta explícitamente su recibo original:
+const receipt = await recoverCrmReceipt(client, originalWrite);
+```
+
+Conserva `originalWrite` como la intención original inmutable `{ name, arguments }`
+en la misma conexión. La recuperación envía sólo su `idempotency_key` original y
+exige el permiso actual de la operación original aunque sea de sólo lectura. Asigna
+`confirmed` sólo tras la autorización humana de la escritura concreta. Los wrappers
+conservan los esquemas nativos, extensiones, campos omitidos, nulos explícitos,
+versiones originales y máscaras de campos. No generan claves, reintentan escrituras
+ni recuperan recibos automáticamente. Los resultados conservan el contenido MCP nativo;
+los tipos de salida exportados describen su envelope de datos JSON.
+
 Las pruebas locales utilizan un upstream aislado. Verifican el transporte, la paginación,
 los envelopes CRM nativos y la conservación de errores; no demuestran disponibilidad
 en un despliegue, aislamiento entre empresas ni el flujo OAuth y la renovación de

@@ -11,6 +11,8 @@ for (const required of [
   'dist/index.js',
   'dist/discovery.js',
   'dist/discovery.d.ts',
+  'dist/crm.js',
+  'dist/crm.d.ts',
   'LICENSE',
   'README.md',
   'README.es.md',
@@ -29,6 +31,11 @@ for (const file of files) {
 }
 if (!readFileSync('dist/index.js', 'utf8').startsWith('#!/usr/bin/env node'))
   problems.push('dist/index.js lacks its shebang');
+
+const crm = await import('@factuarea/mcp/crm');
+for (const name of ['callCrmTool', 'discoverCrmApplicability', 'recoverCrmReceipt']) {
+  if (typeof crm[name] !== 'function') problems.push(`CRM package export lacks ${name}`);
+}
 
 if (problems.length > 0) {
   console.error(`verify:package\n  ${problems.join('\n  ')}`);
