@@ -40,8 +40,14 @@
       "environmentVariables": [
         {
           "name": "FACTUAREA_API_KEY",
-          "description": "Factuarea API key. The prefix selects the environment: fact_test_ for the isolated sandbox, fact_live_ for the real company. Without it the server starts and refuses every call with an actionable error.",
-          "isRequired": true,
+          "description": "Factuarea API key. The prefix selects fact_test_ sandbox or fact_live_ real company. Configure this or FACTUAREA_OAUTH_BEARER, never both.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "FACTUAREA_OAUTH_BEARER",
+          "description": "Current native OAuth access token supplied by your host, instead of FACTUAREA_API_KEY. The bridge does not refresh tokens or retry mutations.",
+          "isRequired": false,
           "isSecret": true
         },
         {

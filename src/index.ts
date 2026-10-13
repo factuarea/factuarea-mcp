@@ -11,6 +11,7 @@ Run it from an MCP client; it speaks JSON-RPC on stdin/stdout.
 Environment:
   FACTUAREA_API_KEY             API key (fact_live_… or fact_test_…). Create one at
                                 ${API_KEYS_URL}
+  FACTUAREA_OAUTH_BEARER        Current native OAuth access token, instead of API key.
   FACTUAREA_MCP_URL             Server endpoint. Default ${DEFAULT_MCP_URL}
   FACTUAREA_REQUEST_TIMEOUT_MS  Ceiling for a single call. Default ${DEFAULT_TIMEOUT_MS}
 

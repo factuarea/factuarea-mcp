@@ -41,6 +41,23 @@ describe('loadConfig', () => {
   });
 });
 
+describe('native OAuth bearer configuration', () => {
+  it('selects the actual bearer without deriving environment or identity', () => {
+    const config = loadConfig({ FACTUAREA_OAUTH_BEARER: 'native-owner-access-token' });
+    expect(config.oauthBearer).toBe('native-owner-access-token');
+    expect(config.apiKey).toBeUndefined();
+  });
+
+  it('rejects mixed sources, API keys in the OAuth source and malformed bearer values', () => {
+    expect(() =>
+      loadConfig({ FACTUAREA_API_KEY: 'fact_test_existing', FACTUAREA_OAUTH_BEARER: 'native-token' }),
+    ).toThrow(ConfigError);
+    for (const bearer of ['fact_test_existing', 'two tokens', 'secret\nvalue']) {
+      expect(() => loadConfig({ FACTUAREA_OAUTH_BEARER: bearer })).toThrow(ConfigError);
+    }
+  });
+});
+
 describe('environmentOf', () => {
   it('reads the environment from the key prefix', () => {
     expect(environmentOf('fact_live_abc')).toBe('live');

@@ -85,7 +85,7 @@ claude mcp add --transport http factuarea https://mcp.factuarea.com \
 <br>
 
 `@factuarea/mcp` is a small stdio server that forwards every request to
-`https://mcp.factuarea.com` with your API key. It is the setup for the Claude Desktop
+`https://mcp.factuarea.com` with your API key or the current native OAuth access token supplied by your host. It is the setup for the Claude Desktop
 configuration file, agent frameworks and any client without remote-server support.
 Node 20 or later.
 
@@ -101,11 +101,15 @@ Node 20 or later.
 }
 ```
 
-| Variable                       | Meaning                                                                                                |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| `FACTUAREA_API_KEY`            | Your API key. Without it the server still starts, and each call replies with how to create one.        |
-| `FACTUAREA_MCP_URL`            | Server endpoint. Default `https://mcp.factuarea.com`; only `https://` is accepted outside `localhost`. |
-| `FACTUAREA_REQUEST_TIMEOUT_MS` | Time limit per call. Default `120000`.                                                                 |
+| Variable                       | Meaning                                                                                                       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `FACTUAREA_API_KEY`            | Your API key, as an alternative to OAuth bearer. Without a credential the server starts and refuses calls.    |
+| `FACTUAREA_OAUTH_BEARER`       | Current native OAuth access token instead of API key. Configure one credential source; the host owns renewal. |
+| `FACTUAREA_MCP_URL`            | Server endpoint. Default `https://mcp.factuarea.com`; only `https://` is accepted outside `localhost`.        |
+| `FACTUAREA_REQUEST_TIMEOUT_MS` | Time limit per call. Default `120000`.                                                                        |
+
+The OAuth bearer is supplied by your host. The bridge does not refresh it or retry a tool call after an error.
+Company, environment and scopes come from the hosted server.
 
 The package contains no business logic of its own: tools, rules and permissions are always
 the server's, so the local and the remote connection behave the same. Versions are published

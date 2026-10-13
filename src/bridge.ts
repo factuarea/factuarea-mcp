@@ -57,9 +57,18 @@ export interface Bridge {
  * log file; one that answers says why in the client itself.
  */
 export async function createBridge({ config, log = () => {}, fetch }: BridgeOptions): Promise<Bridge> {
-  const upstream = config.apiKey
-    ? new Upstream({ url: config.url, apiKey: config.apiKey, timeoutMs: config.timeoutMs, ...(fetch && { fetch }) })
-    : undefined;
+  if (config.apiKey && config.oauthBearer) throw new TypeError('Configure exactly one credential source.');
+  const authModel = config.oauthBearer ? 'oauth' : 'api_key';
+  const upstream =
+    config.apiKey || config.oauthBearer
+      ? new Upstream({
+          url: config.url,
+          apiKey: config.apiKey,
+          oauthBearer: config.oauthBearer,
+          timeoutMs: config.timeoutMs,
+          ...(fetch && { fetch }),
+        })
+      : undefined;
 
   let info: UpstreamInfo | undefined;
   if (!upstream) {
@@ -71,7 +80,9 @@ export async function createBridge({ config, log = () => {}, fetch }: BridgeOpti
       info = await upstream.connect();
       log(describeConnection(config, info));
     } catch (error) {
-      log(`Could not connect yet, will retry on the first call: ${toForwardedError(error, config.url).message}`);
+      log(
+        `Could not connect yet, will retry on the first call: ${toForwardedError(error, config.url, authModel).message}`,
+      );
     }
   }
 
@@ -109,7 +120,7 @@ export async function createBridge({ config, log = () => {}, fetch }: BridgeOpti
           });
           return result as ServerResult;
         } catch (error) {
-          throw toForwardedError(error, config.url);
+          throw toForwardedError(error, config.url, authModel);
         }
       });
     }
@@ -129,6 +140,8 @@ function relayedCapabilities(capabilities: ServerCapabilities): RelayedCapabilit
 }
 
 function describeConnection(config: BridgeConfig, info: UpstreamInfo): string {
+  if (config.oauthBearer)
+    return `Connected to ${config.url.href} — native OAuth bearer; company, environment and scopes are checked by the hosted server.`;
   const environment = environmentOf(config.apiKey);
   const mode =
     environment === 'test'
