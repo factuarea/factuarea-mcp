@@ -452,6 +452,81 @@ describe('native CRM relay contracts', () => {
 });
 
 describe('native OAuth and Original hosted relay', () => {
+  it('uses the active tenant bearer for every CRM context read without caching a prior company context', async () => {
+    let token = 'tenant-a-access-token';
+    const contexts = [
+      {
+        company_id: UUID.document,
+        credential_id: UUID.producer,
+        environment: 'live',
+        scopes: ['crm_access_context:read'],
+        authorization_version: 'tenant-a-v1',
+      },
+      {
+        company_id: UUID.other,
+        credential_id: UUID.ticket,
+        environment: 'test',
+        scopes: ['crm_access_context:read', 'crm_activities:read'],
+        authorization_version: 'tenant-b-v1',
+      },
+      {
+        company_id: UUID.document,
+        credential_id: UUID.producer,
+        environment: 'live',
+        scopes: ['crm_access_context:read'],
+        authorization_version: 'tenant-a-v1',
+      },
+    ];
+    let contextRead = 0;
+    const fake = await startFakeUpstream({
+      currentBearer: () => token,
+      listTools: () => ({ tools: [CRM_NATIVE_READ_FIXTURES[0]!.tool] }),
+      callTool: ({ name }) => {
+        expect(name).toBe('get_crm_credential_context');
+        return result(contexts[contextRead++]!);
+      },
+    });
+    cleanups.push(() => fake.close());
+    const bridge = await createBridge({
+      config: { apiKey: undefined, oauthBearer: () => token, url: fake.url, timeoutMs: 5_000 },
+    });
+    const [local, remote] = InMemoryTransport.createLinkedPair();
+    await bridge.server.connect(remote);
+    const client = new Client({ name: 'tenant-context-relay', version: '1.0.0' });
+    await client.connect(local);
+    cleanups.push(async () => {
+      await client.close();
+      await bridge.close();
+    });
+
+    const contextFixture = CRM_NATIVE_READ_FIXTURES[0]!;
+    const readContext = async () =>
+      client.request(
+        {
+          method: 'tools/call',
+          params: { name: contextFixture.tool.name, arguments: contextFixture.arguments },
+        },
+        ResultSchema,
+      );
+
+    const first = await readContext();
+    token = 'tenant-b-access-token';
+    const second = await readContext();
+    token = 'tenant-a-access-token';
+    const third = await readContext();
+
+    expect([first, second, third].map((response) => (response.structuredContent as { data: unknown }).data)).toEqual(
+      contexts,
+    );
+    const calls = fake.requests.filter(({ method }) => method === 'tools/call');
+    expect(calls.map(({ headers }) => headers.authorization)).toEqual([
+      'Bearer tenant-a-access-token',
+      'Bearer tenant-b-access-token',
+      'Bearer tenant-a-access-token',
+    ]);
+    expect(calls).toHaveLength(3);
+  });
+
   it('takes the current actual bearer for each request and preserves context and four readonly tool schemas', async () => {
     let token = 'native-current-access-token';
     const fake = await startFakeUpstream({
