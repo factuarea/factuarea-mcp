@@ -294,6 +294,26 @@ describe('current knowledge and help center MCP wrappers', () => {
     expect(fake.requests.filter((request) => request.method === 'tools/call')).toEqual([]);
   });
 
+  it('forwards an invalid help-center UUID to the owner and preserves its typed rejection once', async () => {
+    const invalidId = '00000000-0000-4000-8000-000000000000';
+    const args = { ...inputs.unpublish_help_center, id: invalidId };
+    const failure = {
+      code: -32008,
+      message: 'invalid_param_value',
+      data: { http_status: 422, code: 'invalid_param_value', param: 'id' },
+    };
+    const { client, fake } = await connect({ listTools: () => ({ tools }), callTool: () => nativeError(failure) });
+
+    await expect(callCrmTool(client, 'unpublish_help_center', args)).rejects.toMatchObject({
+      code: failure.code,
+      data: failure.data,
+      message: `MCP error ${failure.code}: ${failure.message}`,
+    });
+    expect(fake.requests.filter((request) => request.method === 'tools/call').map((request) => request.body)).toEqual([
+      expect.objectContaining({ params: { name: 'unpublish_help_center', arguments: args } }),
+    ]);
+  });
+
   it.each([
     {
       code: -32005,
