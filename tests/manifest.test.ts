@@ -76,12 +76,15 @@ describe('server.json', () => {
     expect(declared).toEqual([...new Set(read)].sort());
   });
 
-  it('marks only the API key as required and secret, and documents the real timeout default', () => {
-    const [apiKey, ...optional] = manifest.packages[0]!.environmentVariables;
-
-    expect(apiKey).toMatchObject({ name: 'FACTUAREA_API_KEY', isRequired: true, isSecret: true });
-    for (const variable of optional) expect(variable).toMatchObject({ isRequired: false, isSecret: false });
-    expect(optional.find((v) => v.name === 'FACTUAREA_REQUEST_TIMEOUT_MS')?.description).toContain(
+  it('declares alternative secret credentials and the real timeout default', () => {
+    const variables = manifest.packages[0]!.environmentVariables;
+    for (const name of ['FACTUAREA_API_KEY', 'FACTUAREA_OAUTH_BEARER']) {
+      expect(variables.find((v) => v.name === name)).toMatchObject({ isRequired: false, isSecret: true });
+    }
+    for (const variable of variables.filter((v) => !['FACTUAREA_API_KEY', 'FACTUAREA_OAUTH_BEARER'].includes(v.name))) {
+      expect(variable).toMatchObject({ isRequired: false, isSecret: false });
+    }
+    expect(variables.find((v) => v.name === 'FACTUAREA_REQUEST_TIMEOUT_MS')?.description).toContain(
       String(DEFAULT_TIMEOUT_MS),
     );
   });

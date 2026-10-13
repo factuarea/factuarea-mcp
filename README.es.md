@@ -86,7 +86,7 @@ Las claves `fact_test_…` trabajan sobre el sandbox; las `fact_live_…`, sobre
 <br>
 
 `@factuarea/mcp` es un pequeño servidor stdio que reenvía cada petición a
-`https://mcp.factuarea.com` con tu API key. Es la opción para el fichero de configuración de
+`https://mcp.factuarea.com` con tu API key o el token de acceso OAuth nativo vigente proporcionado por tu cliente. Es la opción para el fichero de configuración de
 Claude Desktop, los frameworks de agentes y cualquier cliente sin soporte de servidores
 remotos. Requiere Node 20 o superior.
 
@@ -102,11 +102,15 @@ remotos. Requiere Node 20 o superior.
 }
 ```
 
-| Variable                       | Significado                                                                                                   |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `FACTUAREA_API_KEY`            | Tu API key. Sin ella el servidor arranca igualmente y cada llamada responde cómo crear una.                   |
-| `FACTUAREA_MCP_URL`            | Dirección del servidor. Por defecto `https://mcp.factuarea.com`; fuera de `localhost` solo admite `https://`. |
-| `FACTUAREA_REQUEST_TIMEOUT_MS` | Tiempo máximo por llamada. Por defecto `120000`.                                                              |
+| Variable                       | Significado                                                                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `FACTUAREA_API_KEY`            | Tu API key, como alternativa al bearer OAuth. Sin credencial el servidor arranca y rechaza las llamadas.                       |
+| `FACTUAREA_OAUTH_BEARER`       | Token de acceso OAuth nativo vigente en lugar de la API key. Configura una sola credencial; el cliente gestiona su renovación. |
+| `FACTUAREA_MCP_URL`            | Dirección del servidor. Por defecto `https://mcp.factuarea.com`; fuera de `localhost` solo admite `https://`.                  |
+| `FACTUAREA_REQUEST_TIMEOUT_MS` | Tiempo máximo por llamada. Por defecto `120000`.                                                                               |
+
+El cliente proporciona el bearer OAuth. El bridge no lo renueva ni repite una llamada tras un error.
+La empresa, el entorno y los scopes proceden del servidor remoto.
 
 El paquete no contiene lógica de negocio propia: las herramientas, las reglas y los permisos
 son siempre los del servidor, así que la conexión local y la remota se comportan igual. Las

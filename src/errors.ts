@@ -46,11 +46,15 @@ export function missingApiKeyError(): ForwardedError {
  * the resource that explains it) and a paraphrase would only drift. Only an authentication
  * failure gains a sentence, because the fix for it lives in this bridge's configuration.
  */
-export function toForwardedError(error: unknown, url: URL): ForwardedError {
+export function toForwardedError(error: unknown, url: URL, authModel: 'oauth' | 'api_key' = 'api_key'): ForwardedError {
   if (error instanceof ForwardedError) return error;
 
   if (error instanceof McpError) {
-    return withAuthHint(new ForwardedError(error.code, error.message.replace(MCP_ERROR_PREFIX, ''), error.data));
+    return withAuthHint(
+      new ForwardedError(error.code, error.message.replace(MCP_ERROR_PREFIX, ''), error.data),
+      undefined,
+      authModel,
+    );
   }
 
   if (error instanceof StreamableHTTPError) {
@@ -58,7 +62,7 @@ export function toForwardedError(error: unknown, url: URL): ForwardedError {
     const body = error.message.replace(HTTP_ERROR_PREFIX, '');
     const envelope = parseJsonRpcError(body);
     if (envelope) {
-      return withAuthHint(new ForwardedError(envelope.code, envelope.message, envelope.data), status);
+      return withAuthHint(new ForwardedError(envelope.code, envelope.message, envelope.data), status, authModel);
     }
     return withAuthHint(
       new ForwardedError(
@@ -67,6 +71,7 @@ export function toForwardedError(error: unknown, url: URL): ForwardedError {
         { http_status: status },
       ),
       status,
+      authModel,
     );
   }
 
@@ -77,9 +82,20 @@ export function toForwardedError(error: unknown, url: URL): ForwardedError {
   );
 }
 
-function withAuthHint(error: ForwardedError, httpStatus?: number): ForwardedError {
+function withAuthHint(
+  error: ForwardedError,
+  httpStatus?: number,
+  authModel: 'oauth' | 'api_key' = 'api_key',
+): ForwardedError {
   const isAuthFailure = httpStatus === 401 || (error.code === AUTH_ERROR_CODE && error.message === 'invalid_token');
   if (!isAuthFailure) return error;
+  if (authModel === 'oauth') {
+    return new ForwardedError(
+      error.code,
+      `${error.message} — Factuarea rejected FACTUAREA_OAUTH_BEARER. Supply the current native OAuth access token through your host. The bridge does not refresh or retry the call.`,
+      error.data,
+    );
+  }
   return new ForwardedError(
     error.code,
     `${error.message} — Factuarea rejected FACTUAREA_API_KEY. Check that the key is complete and not revoked, ` +

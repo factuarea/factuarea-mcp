@@ -10,6 +10,10 @@ import {
   ListResourceTemplatesRequestSchema,
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
+  type CallToolRequest,
+  type CallToolResult,
+  type ListToolsRequest,
+  type ListToolsResult,
   type ServerCapabilities,
 } from '@modelcontextprotocol/sdk/types.js';
 
@@ -63,8 +67,12 @@ export interface FakeUpstream {
 
 export interface FakeUpstreamOptions {
   apiKey?: string;
+  currentBearer?: () => string;
   capabilities?: ServerCapabilities;
   instructions?: string;
+  /** Protocol fixtures supply discovery/call responses without adding operations to the bridge. */
+  listTools?: (params: ListToolsRequest['params']) => ListToolsResult;
+  callTool?: (params: CallToolRequest['params']) => CallToolResult | Promise<CallToolResult>;
 }
 
 /**
@@ -92,7 +100,7 @@ export async function startFakeUpstream(options: FakeUpstreamOptions = {}): Prom
     const body = JSON.parse(await readBody(req)) as { method?: string };
     requests.push({ method: body.method, headers: req.headers, body });
 
-    if (req.headers.authorization !== `Bearer ${apiKey}`) {
+    if (req.headers.authorization !== `Bearer ${options.currentBearer?.() ?? apiKey}`) {
       res.writeHead(401, {
         'Content-Type': 'application/json',
         'WWW-Authenticate': 'Bearer realm="mcp", error="invalid_token"',
@@ -111,7 +119,7 @@ export async function startFakeUpstream(options: FakeUpstreamOptions = {}): Prom
       return;
     }
 
-    const server = buildServer(capabilities, options.instructions);
+    const server = buildServer(capabilities, options);
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
     res.on('close', () => {
       void transport.close();
@@ -135,7 +143,8 @@ export async function startFakeUpstream(options: FakeUpstreamOptions = {}): Prom
   };
 }
 
-function buildServer(capabilities: ServerCapabilities, instructions: string | undefined): Server {
+function buildServer(capabilities: ServerCapabilities, options: FakeUpstreamOptions): Server {
+  const { instructions } = options;
   const server = new Server(
     { name: 'factuarea-public', version: '1.0.0' },
     { capabilities, ...(instructions && { instructions }) },
@@ -143,12 +152,15 @@ function buildServer(capabilities: ServerCapabilities, instructions: string | un
 
   if (capabilities.tools) {
     server.setRequestHandler(ListToolsRequestSchema, (request) =>
-      request.params?.cursor === 'page-2'
-        ? { tools: [DELETE_INVOICE_TOOL] }
-        : { tools: [SEARCH_INVOICES_TOOL], nextCursor: 'page-2' },
+      options.listTools
+        ? options.listTools(request.params)
+        : request.params?.cursor === 'page-2'
+          ? { tools: [DELETE_INVOICE_TOOL] }
+          : { tools: [SEARCH_INVOICES_TOOL], nextCursor: 'page-2' },
     );
 
     server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
+      if (options.callTool) return options.callTool(request.params);
       const { name, arguments: args = {} } = request.params;
       switch (name) {
         case 'search_invoices':

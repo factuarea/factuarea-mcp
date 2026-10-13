@@ -37,6 +37,15 @@ describe('toForwardedError', () => {
     expect(error.data).toEqual({ http_status: 401 });
   });
 
+  it('preserves OAuth authentication data and identifies the actual bearer source', () => {
+    const data = { http_status: 401, code: 'invalid_token' };
+    const error = toForwardedError(new McpError(-32001, 'invalid_token', data), URL_, 'oauth');
+    expect(error.code).toBe(-32001);
+    expect(error.data).toEqual(data);
+    expect(error.message).toContain('FACTUAREA_OAUTH_BEARER');
+    expect(error.message).not.toContain('FACTUAREA_API_KEY');
+  });
+
   it('describes an HTTP failure whose body is not JSON-RPC', () => {
     const error = toForwardedError(
       new StreamableHTTPError(502, 'Error POSTing to endpoint: <html>Bad gateway</html>'),

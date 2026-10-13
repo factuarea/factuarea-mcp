@@ -2,9 +2,13 @@ import { DEFAULT_MCP_URL, DEFAULT_TIMEOUT_MS } from './defaults.js';
 
 export type Environment = 'live' | 'test' | 'unknown';
 
+export type OAuthBearerSource = string | (() => string | Promise<string>);
+
 export interface BridgeConfig {
   /** Bearer credential sent to the hosted server. Absent means "start, but refuse every call". */
   apiKey: string | undefined;
+  /** Current native OAuth access token. A provider supplies the current token for each HTTP request. */
+  oauthBearer?: OAuthBearerSource;
   /** Streamable HTTP endpoint of the hosted server. */
   url: URL;
   /** Hard ceiling on a single forwarded request, in milliseconds. */
@@ -26,6 +30,11 @@ const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
  */
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): BridgeConfig {
   const apiKey = env.FACTUAREA_API_KEY?.trim() || undefined;
+  const oauthBearer = env.FACTUAREA_OAUTH_BEARER?.trim() || undefined;
+  if (apiKey && oauthBearer) {
+    throw new ConfigError('Configure exactly one of FACTUAREA_API_KEY and FACTUAREA_OAUTH_BEARER.');
+  }
+  if (oauthBearer) validateOAuthBearer(oauthBearer);
 
   const rawUrl = env.FACTUAREA_MCP_URL?.trim() || DEFAULT_MCP_URL;
   let url: URL;
@@ -51,7 +60,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BridgeConfig {
     }
   }
 
-  return { apiKey, url, timeoutMs };
+  return { apiKey, url, timeoutMs, ...(oauthBearer && { oauthBearer }) };
 }
 
 /** The key prefix is the only environment switch: `fact_live_` or `fact_test_`. */
@@ -59,4 +68,11 @@ export function environmentOf(apiKey: string | undefined): Environment {
   if (apiKey?.startsWith('fact_live_')) return 'live';
   if (apiKey?.startsWith('fact_test_')) return 'test';
   return 'unknown';
+}
+
+/** Validate a real token source without deriving tenant, environment or refresh ancestry from it. */
+export function validateOAuthBearer(value: unknown): asserts value is string {
+  if (typeof value !== 'string' || !/^[\x21-\x7e]{1,4096}$/.test(value) || value.startsWith('fact_')) {
+    throw new ConfigError('FACTUAREA_OAUTH_BEARER requires the current native OAuth access token.');
+  }
 }

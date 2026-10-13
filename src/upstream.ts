@@ -8,6 +8,7 @@ import {
   type Result,
   type ServerCapabilities,
 } from '@modelcontextprotocol/sdk/types.js';
+import { validateOAuthBearer, type OAuthBearerSource } from './config.js';
 import { VERSION } from './defaults.js';
 
 export interface UpstreamInfo {
@@ -30,7 +31,8 @@ export class Upstream {
   constructor(
     private readonly options: {
       url: URL;
-      apiKey: string;
+      apiKey?: string;
+      oauthBearer?: OAuthBearerSource;
       timeoutMs: number;
       fetch?: FetchLike;
     },
@@ -76,16 +78,31 @@ export class Upstream {
     return this.#client;
   }
 
+  #oauthFetch(): FetchLike {
+    const source = this.options.oauthBearer;
+    const fetchRequest = this.options.fetch ?? globalThis.fetch;
+    return async (input, init) => {
+      const bearer = typeof source === 'function' ? await source() : source;
+      validateOAuthBearer(bearer);
+      const headers = new Headers(init?.headers);
+      headers.set('Authorization', `Bearer ${bearer}`);
+      // The host owns renewal. A call never refreshes a token or redispatches a mutation.
+      return fetchRequest(input, { ...init, headers, redirect: 'error' });
+    };
+  }
+
   async #open(): Promise<Client> {
     const client = new Client({ name: 'factuarea-mcp', version: VERSION });
     const transport = new StreamableHTTPClientTransport(this.options.url, {
       requestInit: {
         headers: {
-          Authorization: `Bearer ${this.options.apiKey}`,
+          ...(!this.options.oauthBearer && { Authorization: `Bearer ${this.options.apiKey}` }),
           'User-Agent': `factuarea-mcp/${VERSION} node/${process.versions.node}`,
         },
       },
-      ...(this.options.fetch && { fetch: this.options.fetch }),
+      ...(this.options.oauthBearer
+        ? { fetch: this.#oauthFetch() }
+        : this.options.fetch && { fetch: this.options.fetch }),
     });
     await client.connect(transport, { timeout: this.options.timeoutMs });
     return client;
