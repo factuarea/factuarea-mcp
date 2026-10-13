@@ -7,14 +7,35 @@ const [pack] = JSON.parse(execFileSync('npm', ['pack', '--dry-run', '--json'], {
 const files = pack.files.map((file) => file.path).sort();
 const problems = [];
 
-for (const required of ['dist/index.js', 'LICENSE', 'README.md', 'package.json']) {
+for (const required of [
+  'dist/index.js',
+  'dist/discovery.js',
+  'dist/discovery.d.ts',
+  'dist/crm.js',
+  'dist/crm.d.ts',
+  'LICENSE',
+  'README.md',
+  'README.es.md',
+  'package.json',
+  'plugin.json',
+  'mcp.json',
+  'skills/crm/SKILL.md',
+  'skills/crm/references/journey.md',
+]) {
   if (!files.includes(required)) problems.push(`missing ${required}`);
 }
 for (const file of files) {
-  if (/^(src|tests|scripts|\.github)\//.test(file) || file.endsWith('.ts')) problems.push(`should not ship ${file}`);
+  const declaration = /^dist\/.+\.d\.ts$/.test(file);
+  if (/^(src|tests|scripts|\.github)\//.test(file) || (file.endsWith('.ts') && !declaration))
+    problems.push(`should not ship ${file}`);
 }
 if (!readFileSync('dist/index.js', 'utf8').startsWith('#!/usr/bin/env node'))
   problems.push('dist/index.js lacks its shebang');
+
+const crm = await import('@factuarea/mcp/crm');
+for (const name of ['callCrmTool', 'discoverCrmApplicability', 'recoverCrmReceipt']) {
+  if (typeof crm[name] !== 'function') problems.push(`CRM package export lacks ${name}`);
+}
 
 if (problems.length > 0) {
   console.error(`verify:package\n  ${problems.join('\n  ')}`);

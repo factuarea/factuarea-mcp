@@ -1,0 +1,1175 @@
+[
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "approve_knowledge_article",
+      "title": "Aprobar artículo de conocimiento",
+      "description": "Aprueba la revisión nativa del artículo con UUIDv7, CAS original y confirmación explícita. Exige autoridad corporativa de publicación vigente y máscaras actuales.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": ["expected_version", "id", "idempotency_key", "confirmed"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "archive_knowledge_article",
+      "title": "Archivar artículo de conocimiento",
+      "description": "Archiva el artículo nativo con UUIDv7, CAS original y confirmación explícita. Conserva el historial y exige acceso actual al registro y a los campos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": ["expected_version", "id", "idempotency_key", "confirmed"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "create_knowledge_article",
+      "title": "Crear artículo de conocimiento",
+      "description": "Crea un borrador nativo con CAS cero, slug y contenido seguro. Requiere confirmación explícita y conserva la clave y los argumentos originales.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 0
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100000
+          },
+          "editorial_locale": {
+            "type": "string",
+            "enum": ["es", "en", "ca"]
+          },
+          "category_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+            },
+            "maxItems": 50,
+            "uniqueItems": true
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "expected_version",
+          "title",
+          "body",
+          "editorial_locale",
+          "category_ids",
+          "slug",
+          "idempotency_key",
+          "confirmed"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:read",
+    "descriptor": {
+      "name": "get_knowledge_article",
+      "title": "Consultar artículo de conocimiento",
+      "description": "Consulta un artículo por su UUIDv7 nativo con autoridad corporativa, Company, entorno, ámbitos y máscaras actuales. Devuelve el CAS y los campos legibles, incluida la publicación vigente mediante published_version y audience. Los vínculos privados no se incluyen.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$",
+            "description": "UUIDv7 nativo del artículo."
+          }
+        },
+        "required": ["id"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:read",
+    "descriptor": {
+      "name": "get_knowledge_article_versions",
+      "title": "Consultar versiones del artículo",
+      "description": "Lee las revisiones editoriales inmutables del artículo, también archivado, con acceso y máscaras actuales. Mantiene revision_number separado del CAS version; conserva omisión de campos ocultos y no modifica ni restaura revisiones.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$",
+            "description": "UUIDv7 nativo del artículo."
+          }
+        },
+        "required": ["id"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "link_knowledge_article",
+      "title": "Vincular artículo de conocimiento",
+      "description": "Vincula el artículo a un ticket o documento nativo acreditado con sus UUIDv7 y CAS originales. Requiere confirmación explícita; el vínculo no concede acceso al destino.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "target_type": {
+            "type": "string",
+            "enum": ["ticket", "document"]
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "target_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "expected_version",
+          "target_type",
+          "target_id",
+          "target_version",
+          "id",
+          "idempotency_key",
+          "confirmed"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:read",
+    "descriptor": {
+      "name": "list_knowledge_categories",
+      "title": "Consultar categorías de conocimiento",
+      "description": "Consulta categorías nativas de la empresa actual, su jerarquía parent_id y versiones originales con permisos y máscaras vigentes. Sólo lectura; la visibilidad editorial pública no concede acceso anónimo.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "publish_knowledge_article_version",
+      "title": "Publicar versión de artículo",
+      "description": "Publica únicamente una revisión aprobada explícita para la audiencia internal, portal o public. Exige UUIDv7, CAS original, autoridad corporativa actual y confirmación; la audiencia no abre acceso anónimo.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "published_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "audience": {
+            "type": "string",
+            "enum": ["internal", "portal", "public"]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": ["expected_version", "published_version", "audience", "id", "idempotency_key", "confirmed"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_article_approve_receipt",
+      "title": "Consultar recibo original de approve",
+      "description": "Consulta sólo el recibo confirmado original de knowledge_articles.approve con su misma clave y autoridad actual de la operación original. Conserva el CAS original y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_article_archive_receipt",
+      "title": "Consultar recibo original de archive",
+      "description": "Consulta sólo el recibo confirmado original de knowledge_articles.archive con su misma clave y autoridad actual de la operación original. Conserva el CAS original y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_article_create_receipt",
+      "title": "Consultar recibo original de create",
+      "description": "Consulta sólo el recibo confirmado original de knowledge_articles.create con su misma clave y autoridad actual de la operación original. Conserva el CAS original y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_article_link_receipt",
+      "title": "Consultar recibo original de link",
+      "description": "Consulta sólo el recibo confirmado original de knowledge_articles.link con su misma clave y autoridad actual de la operación original. Conserva el CAS original y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_article_publish_receipt",
+      "title": "Consultar recibo original de publish",
+      "description": "Consulta sólo el recibo confirmado original de knowledge_articles.publish con su misma clave y autoridad actual de la operación original. Conserva el CAS original y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_article_save_receipt",
+      "title": "Consultar recibo original de save",
+      "description": "Consulta sólo el recibo confirmado original de knowledge_articles.save con su misma clave y autoridad actual de la operación original. Conserva el CAS original y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_article_submit_receipt",
+      "title": "Consultar recibo original de submit",
+      "description": "Consulta sólo el recibo confirmado original de knowledge_articles.submit con su misma clave y autoridad actual de la operación original. Conserva el CAS original y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_article_unpublish_receipt",
+      "title": "Consultar recibo original de unpublish",
+      "description": "Consulta sólo el recibo confirmado original de knowledge_articles.unpublish con su misma clave y autoridad actual de la operación original. Conserva el CAS original y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "recover_knowledge_category_receipt",
+      "title": "Consultar recibo original de categoría",
+      "description": "Consulta sólo el recibo confirmado original con su misma clave y autoridad corporativa actual. Mantiene ambos CAS originales y las máscaras actuales; no guarda, reclama, confirma ni reintenta efectos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Nunca genera una clave nueva ni reintenta un efecto ambiguo."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "save_knowledge_article",
+      "title": "Guardar artículo de conocimiento",
+      "description": "Guarda una nueva revisión nativa del artículo con UUIDv7 y CAS original. Requiere confirmación explícita y permisos actuales; mantiene su publicación aprobada.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100000
+          },
+          "editorial_locale": {
+            "type": "string",
+            "enum": ["es", "en", "ca"]
+          },
+          "category_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+            },
+            "maxItems": 50,
+            "uniqueItems": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "expected_version",
+          "title",
+          "body",
+          "editorial_locale",
+          "category_ids",
+          "id",
+          "idempotency_key",
+          "confirmed"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "save_knowledge_category",
+      "title": "Guardar categoría de conocimiento",
+      "description": "Guarda una categoría nativa con UUIDv7, CAS original de término y taxonomía, permisos corporativos actuales y confirmación explícita. Conserva la clave y el recibo originales; no reintenta un efecto ambiguo.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "taxonomy_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "expected_taxonomy_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "expected_version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9223372036854775806
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": ["internal", "portal", "public"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "archived"]
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Nunca genera una clave nueva ni reintenta un efecto ambiguo."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "taxonomy_id",
+          "expected_taxonomy_version",
+          "expected_version",
+          "name",
+          "slug",
+          "parent_id",
+          "visibility",
+          "status",
+          "idempotency_key",
+          "confirmed"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:read",
+    "descriptor": {
+      "name": "search_knowledge_articles",
+      "title": "Buscar artículos de conocimiento",
+      "description": "Busca artículos nativos por texto e idioma editorial con acceso corporativo, ámbitos y máscaras actuales. Los candidatos se autorizan antes del contenido, la clasificación, el recuento y la paginación. La publicación vigente conserva published_version y audience sólo cuando son legibles.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "locale": {
+            "type": ["string", "null"],
+            "enum": ["es", "en", "ca", null]
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000,
+            "default": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "submit_knowledge_article_review",
+      "title": "Enviar artículo a revisión",
+      "description": "Envía el borrador nativo a revisión con UUIDv7, CAS original y confirmación explícita. Conserva el recibo original sin repetir efectos ambiguos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": ["expected_version", "id", "idempotency_key", "confirmed"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:read",
+    "descriptor": {
+      "name": "suggest_service_articles",
+      "title": "Sugerir artículos para un ticket",
+      "description": "Consulta publicaciones aprobadas que coinciden con el texto explícito para el ticket_id y su versión originales. Comprueba acceso actual antes de ordenar, contar o limitar. No utiliza notas privadas del ticket ni adjunta artículos automáticamente. Sólo lectura.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "ticket_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": ["es", "en", "ca"]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "audience": {
+            "type": "string",
+            "enum": ["internal", "portal", "public"],
+            "default": "internal"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25,
+            "default": 10
+          }
+        },
+        "required": ["ticket_id", "ticket_version"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "knowledge_articles:write",
+    "descriptor": {
+      "name": "unpublish_knowledge_article",
+      "title": "Retirar publicación de artículo",
+      "description": "Retira la publicación nativa con UUIDv7, CAS original, autoridad corporativa vigente y confirmación explícita. Conserva las revisiones históricas y el recibo original.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "La clave original del recibo durable. Conserva la misma intención y consulta el recibo si el efecto no está confirmado."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": ["expected_version", "id", "idempotency_key", "confirmed"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "public_help_centers:write",
+    "descriptor": {
+      "name": "get_help_center_administration",
+      "title": "Consultar la administración del centro de ayuda",
+      "description": "Consulta la configuración del centro de la empresa autenticada actual, o null si no existe opt-in. No publica ni recupera efectos. Exige el permiso administrativo original y las máscaras corporativas actuales; no recibe Company, actor, tokens de portal ni identificadores de visitantes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "public_help_centers:write",
+    "descriptor": {
+      "name": "publish_help_center",
+      "title": "Publicar el centro de ayuda",
+      "description": "Crea o guarda y publica el manifiesto explícito con UUIDv7, CAS original, clave inmutable y confirmed true. Exige autoridad corporativa y máscaras actuales. Ante un resultado incierto consulta recover_help_center_publish_receipt con la misma clave; nunca repitas automáticamente la publicación ni generes otra clave. No admite visitantes ni tokens de portal.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775806
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "locale": {
+            "type": "string",
+            "enum": ["es", "en", "ca"]
+          },
+          "article_slugs": {
+            "type": "array",
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "maxLength": 120,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "Clave original inmutable del recibo durable. En caso de resultado incierto consulta la herramienta de recuperación de esta operación con la misma clave; no generes otra clave ni repitas la publicación automáticamente."
+          }
+        },
+        "required": [
+          "confirmed",
+          "expected_version",
+          "slug",
+          "display_name",
+          "locale",
+          "article_slugs",
+          "idempotency_key"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "required": ["id"]
+            },
+            "then": {
+              "properties": {
+                "expected_version": {
+                  "minimum": 1
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "expected_version": {
+                  "const": 0
+                }
+              }
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "public_help_centers:write",
+    "descriptor": {
+      "name": "recover_help_center_publish_receipt",
+      "title": "Consultar el recibo original de publicación",
+      "description": "Lee sólo el recibo confirmado original de publicación con la misma clave, CAS y UUID del resultado original, bajo autoridad y máscaras administrativas actuales. No publica, reserva, reclama, confirma ni repite efectos, y no sustituye el recibo por la configuración actual.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "Clave original inmutable del recibo durable. En caso de resultado incierto consulta la herramienta de recuperación de esta operación con la misma clave; no generes otra clave ni repitas la publicación automáticamente."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "public_help_centers:write",
+    "descriptor": {
+      "name": "recover_help_center_unpublish_receipt",
+      "title": "Consultar el recibo original de retirada",
+      "description": "Lee sólo el recibo confirmado original de retirada con la misma clave, CAS y UUID del resultado original, bajo autoridad y máscaras administrativas actuales. No retira, reserva, reclama, confirma ni repite efectos, y no sustituye el recibo por la configuración actual.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "Clave original inmutable del recibo durable. En caso de resultado incierto consulta la herramienta de recuperación de esta operación con la misma clave; no generes otra clave ni repitas la publicación automáticamente."
+          }
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  },
+  {
+    "requiredScope": "public_help_centers:write",
+    "descriptor": {
+      "name": "unpublish_help_center",
+      "title": "Retirar la publicación del centro de ayuda",
+      "description": "Retira la publicación con el id UUIDv7, CAS original, clave inmutable y confirmed true sin cambiar artículos internos. Exige autoridad corporativa y máscaras actuales. Ante un resultado incierto consulta recover_help_center_unpublish_receipt con la misma clave; nunca repitas automáticamente el efecto ni generes otra clave. No admite visitantes ni tokens de portal.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "confirmed": {
+            "type": "boolean",
+            "const": true
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775806
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[ -~]+$",
+            "description": "Clave original inmutable del recibo durable. En caso de resultado incierto consulta la herramienta de recuperación de esta operación con la misma clave; no generes otra clave ni repitas la publicación automáticamente."
+          }
+        },
+        "required": ["confirmed", "expected_version", "idempotency_key", "id"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  }
+]

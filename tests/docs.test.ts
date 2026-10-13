@@ -3,7 +3,15 @@ import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const READMES = ['README.md', 'README.es.md'];
-const DOCUMENTS = [...READMES, 'CONTRIBUTING.md', 'SECURITY.md', 'AGENTS.md', 'CHANGELOG.md'];
+const DOCUMENTS = [
+  ...READMES,
+  'CONTRIBUTING.md',
+  'SECURITY.md',
+  'AGENTS.md',
+  'CHANGELOG.md',
+  'skills/crm/SKILL.md',
+  'skills/crm/references/journey.md',
+];
 
 /** Relative Markdown links and `href`/`src` attributes: the ones a rename can break silently. */
 function relativeLinks(markdown: string): string[] {

@@ -59,7 +59,7 @@ concedes.
 | **ChatGPT**                   | Añade un conector personalizado (modo desarrollador) con la URL y OAuth                                                                                                             |
 | **Cursor**                    | El botón _Add to Cursor_, o `{ "mcpServers": { "factuarea": { "url": "https://mcp.factuarea.com" } } }` en `~/.cursor/mcp.json`                                                     |
 | **VS Code**                   | El botón _Instalar_, o `{ "servers": { "factuarea": { "type": "http", "url": "https://mcp.factuarea.com" } } }` en `.vscode/mcp.json`                                               |
-| **Cualquier otro cliente**    | Streamable HTTP con OAuth 2.1 (registro dinámico de clientes y PKCE)                                                                                                                |
+| **Cualquier otro cliente**    | Streamable HTTP con OAuth 2.1, PKCE y los requisitos de registro o metadatos de cliente anunciados por el servidor de autorización                                                  |
 
 El acceso MCP está **incluido en todos los planes de Factuarea**, también durante la prueba.
 
@@ -113,6 +113,68 @@ son siempre los del servidor, así que la conexión local y la remota se comport
 versiones se publican desde CI con [procedencia de npm](https://docs.npmjs.com/generating-provenance-statements).
 
 </details>
+
+## Plugin CRM y descubrimiento de herramientas
+
+El paquete incluye un [manifiesto de plugin](plugin.json), una [configuración MCP remota](mcp.json)
+y una [skill CRM](skills/crm/SKILL.md). Un host compatible se conecta al servidor
+Factuarea existente y gestiona el consentimiento OAuth, las credenciales del cliente,
+el almacenamiento de tokens y su renovación. Los hosts que utilicen metadatos de cliente
+o `private_key_jwt` deben cumplir los requisitos anunciados por el servidor de autorización.
+El puente stdio continúa utilizando una API key.
+
+La skill CRM cubre personas de contacto, leads y pipelines **cuando sus herramientas
+canónicas aparecen en el catálogo de la conexión**. La disponibilidad depende de la
+empresa, el plan, el despliegue y los permisos de la credencial. Consulta los esquemas
+anunciados antes de actuar y no registra alias ni inicia sincronizaciones. Sigue el
+[recorrido CRM](skills/crm/references/journey.md) para consultar un prospecto y preparar
+un cambio autorizado.
+
+Con un cliente JavaScript del SDK MCP que ya esté conectado:
+
+```ts
+import { discoverTools } from '@factuarea/mcp/discovery';
+
+const tools = await discoverTools(client, {
+  requestOptions: { signal: abortController.signal, timeout: 30_000 },
+});
+```
+
+La función sigue todos los `nextCursor` opacos, conserva los esquemas y metadatos
+nativos y elimina nombres duplicados conservando el descriptor más reciente. Comienza
+de nuevo en cada llamada y propaga los errores nativos sin devolver un catálogo parcial.
+La opción `perPage` reenvía el parámetro `per_page` del servidor; si se omite, utiliza
+el valor configurado en el servidor. Los cursores permanecen en la misma identidad de
+cliente. El descubrimiento no garantiza una instantánea atómica ni concede autorización
+para ejecutar: el servidor comprueba de nuevo cada llamada posterior.
+
+`@factuarea/mcp/crm` añade llamadas tipadas de conocimiento y centros de ayuda. Usa
+`discoverCrmApplicability` para consultar los descriptores actuales y `callCrmTool`
+para redescubrir y reenviar una llamada canónica con tus argumentos exactos. Una
+herramienta ausente produce `CrmToolUnavailableError`. El catálogo completo sigue
+disponible, incluidas las herramientas existentes de personas de contacto, leads y pipelines.
+
+```ts
+import { callCrmTool, recoverCrmReceipt } from '@factuarea/mcp/crm';
+
+const result = await callCrmTool(client, 'get_knowledge_article', { id: articleId });
+// Tras un resultado incierto de escritura, consulta explícitamente su recibo original:
+const receipt = await recoverCrmReceipt(client, originalWrite);
+```
+
+Conserva `originalWrite` como la intención original inmutable `{ name, arguments }`
+en la misma conexión. La recuperación envía sólo su `idempotency_key` original y
+exige el permiso actual de la operación original aunque sea de sólo lectura. Asigna
+`confirmed` sólo tras la autorización humana de la escritura concreta. Los wrappers
+conservan los esquemas nativos, extensiones, campos omitidos, nulos explícitos,
+versiones originales y máscaras de campos. No generan claves, reintentan escrituras
+ni recuperan recibos automáticamente. Los resultados conservan el contenido MCP nativo;
+los tipos de salida exportados describen su envelope de datos JSON.
+
+Las pruebas locales utilizan un upstream aislado. Verifican el transporte, la paginación,
+los envelopes CRM nativos y la conservación de errores; no demuestran disponibilidad
+en un despliegue, aislamiento entre empresas ni el flujo OAuth y la renovación de
+credenciales de un host real.
 
 ## Pídele cosas como
 

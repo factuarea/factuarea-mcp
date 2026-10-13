@@ -17,6 +17,12 @@ import { API_KEYS_URL, SERVER_NAME, VERSION } from './defaults.js';
 import { missingApiKeyError, toForwardedError } from './errors.js';
 import { Upstream, type UpstreamInfo } from './upstream.js';
 
+// Factuarea also accepts per_page. Keep server extensions instead of letting the SDK's
+// standard pagination schema discard them before they reach the hosted handler.
+const RelayListToolsRequestSchema = ListToolsRequestSchema.extend({
+  params: ListToolsRequestSchema.shape.params.unwrap().loose().optional(),
+});
+
 /**
  * The capabilities this bridge can relay, and the requests each one brings.
  *
@@ -25,7 +31,7 @@ import { Upstream, type UpstreamInfo } from './upstream.js';
  * client an event that can never arrive.
  */
 const RELAYED = {
-  tools: [ListToolsRequestSchema, CallToolRequestSchema],
+  tools: [RelayListToolsRequestSchema, CallToolRequestSchema],
   prompts: [ListPromptsRequestSchema, GetPromptRequestSchema],
   resources: [ListResourcesRequestSchema, ListResourceTemplatesRequestSchema, ReadResourceRequestSchema],
   completions: [CompleteRequestSchema],
