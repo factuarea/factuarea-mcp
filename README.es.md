@@ -35,7 +35,7 @@
 ---
 
 <p align="center">
-  <strong>+550</strong> tools · <strong>35</strong> dominios · <strong>9</strong> guías fiscales · <strong>5</strong> flujos guiados · entornos <strong>real</strong> y <strong>sandbox</strong>
+  <strong>+550</strong> tools · <strong>37</strong> dominios · <strong>9</strong> guías fiscales · <strong>5</strong> flujos guiados · entornos <strong>real</strong> y <strong>sandbox</strong>
 </p>
 
 [Factuarea](https://factuarea.com) es una plataforma de facturación y gestión para empresas y
@@ -136,16 +136,17 @@ versiones se publican desde CI con [procedencia de npm](https://docs.npmjs.com/g
 
 ## Qué cubre
 
-|                           |                                                                                                                                                                                                                           |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🧾 **Ventas**             | Facturas de borrador a cobrada — envío, programación, recordatorios, cobros, anulación y rectificativas — además de presupuestos, proformas, albaranes firmados y facturas recurrentes                                    |
-| 📥 **Compras**            | Facturas de proveedor con adjuntos, pagos y listados de pendientes y vencidas                                                                                                                                             |
-| 📦 **Catálogo**           | Contactos que son clientes, proveedores o ambos; productos con variantes, presentaciones y stock; ofertas de proveedor; tarifas; series de numeración; impuestos                                                          |
-| 🏛️ **Cumplimiento**       | Registros, eventos y certificados de VeriFactu; FacturaE a administraciones públicas a través de FACe; modelos 303, 347 y 130                                                                                             |
-| ⏱️ **Equipo**             | Empleados, horarios, el registro de jornada del RD-ley 8/2019, ausencias, presencia y festivos                                                                                                                            |
-| ✅ **Tareas y proyectos** | Proyectos con columnas de tablero y campos personalizados; tareas con responsables, etiquetas, comentarios, adjuntos y subtareas; temporizadores y entradas de tiempo que puedes facturar; la agenda y las notificaciones |
-| ⚙️ **Automatización**     | Webhooks y eventos, un motor de reglas con simulación, tiendas WooCommerce y Shopify, autofacturación de Stripe                                                                                                           |
-| 🏢 **Gestorías**          | Empresas gestionadas, API keys, registros de emails y de peticiones                                                                                                                                                       |
+|                           |                                                                                                                                                                                                                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧾 **Ventas**             | Facturas de borrador a cobrada — envío, programación, recordatorios, cobros, anulación y rectificativas — además de presupuestos, proformas, albaranes firmados y facturas recurrentes                                                                                                      |
+| 📥 **Compras**            | Facturas de proveedor con adjuntos, pagos y listados de pendientes y vencidas                                                                                                                                                                                                               |
+| 🚚 **Transporte**         | DeCA, el documento electrónico de control del transporte de mercancías por carretera: borradores (también desde albaranes), emisión, cambios durante el servicio, cierre y anulación, su PDF y la copia por email al transportista — no es un albarán, una factura ni un registro VeriFactu |
+| 📦 **Catálogo**           | Contactos que son clientes, proveedores o ambos; productos con variantes, presentaciones y stock; ofertas de proveedor; tarifas; series de numeración; impuestos                                                                                                                            |
+| 🏛️ **Cumplimiento**       | Registros, eventos y certificados de VeriFactu; FacturaE a administraciones públicas a través de FACe; modelos 303, 347 y 130                                                                                                                                                               |
+| ⏱️ **Equipo**             | Empleados, horarios, el registro de jornada del RD-ley 8/2019, ausencias, presencia y festivos                                                                                                                                                                                              |
+| ✅ **Tareas y proyectos** | Proyectos con columnas de tablero y campos personalizados; tareas con responsables, etiquetas, comentarios, adjuntos y subtareas; temporizadores y entradas de tiempo que puedes facturar; la agenda y las notificaciones                                                                   |
+| ⚙️ **Automatización**     | Webhooks y eventos, un motor de reglas con simulación, tiendas WooCommerce y Shopify, autofacturación de Stripe                                                                                                                                                                             |
+| 🏢 **Gestorías**          | Empresas gestionadas, API keys, registros de emails y de peticiones                                                                                                                                                                                                                         |
 
 Cada herramienta, su dominio y el permiso que necesita: **[docs.factuarea.com/es/mcp/tools](https://docs.factuarea.com/es/mcp/tools)**.
 

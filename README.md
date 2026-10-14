@@ -35,7 +35,7 @@
 ---
 
 <p align="center">
-  <strong>550+</strong> tools · <strong>35</strong> domains · <strong>9</strong> fiscal guardrails · <strong>5</strong> guided workflows · <strong>live</strong> and <strong>sandbox</strong> environments
+  <strong>550+</strong> tools · <strong>37</strong> domains · <strong>9</strong> fiscal guardrails · <strong>5</strong> guided workflows · <strong>live</strong> and <strong>sandbox</strong> environments
 </p>
 
 [Factuarea](https://factuarea.com) is an invoicing and management platform for businesses
@@ -135,16 +135,17 @@ from CI with [npm provenance](https://docs.npmjs.com/generating-provenance-state
 
 ## What it covers
 
-|                         |                                                                                                                                                                                                   |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🧾 **Sales**            | Invoices from draft to paid — sending, scheduling, reminders, payments, voiding and rectificativas — plus quotes, pro-formas, signed delivery notes and recurring invoices                        |
-| 📥 **Purchases**        | Supplier invoices with attachments, payments, overdue and pending lists                                                                                                                           |
-| 📦 **Catalog**          | Contacts that are customers, suppliers or both; products with variants, presentations and stock; supplier offers; price lists; numbering series; taxes                                            |
-| 🏛️ **Compliance**       | VeriFactu records, events and certificates; FacturaE e-invoices to public administrations through FACe; Modelo 303, 347 and 130                                                                   |
-| ⏱️ **Team**             | Employees, work schedules, the working-time register required by RD-ley 8/2019, absences, presence and holidays                                                                                   |
-| ✅ **Tasks & projects** | Projects with board columns and custom fields; tasks with assignees, labels, comments, attachments and subtasks; timers and time entries you can bill on an invoice; the agenda and notifications |
-| ⚙️ **Automation**       | Webhooks and events, a rule engine with dry runs, WooCommerce and Shopify stores, Stripe auto-invoicing                                                                                           |
-| 🏢 **Advisors**         | Managed companies for gestorías, API keys, email and request logs                                                                                                                                 |
+|                         |                                                                                                                                                                                                                                                             |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧾 **Sales**            | Invoices from draft to paid — sending, scheduling, reminders, payments, voiding and rectificativas — plus quotes, pro-formas, signed delivery notes and recurring invoices                                                                                  |
+| 📥 **Purchases**        | Supplier invoices with attachments, payments, overdue and pending lists                                                                                                                                                                                     |
+| 🚚 **Transport**        | DeCA, the electronic control document for road freight: drafts (also from delivery notes), issuing, changes during the service, closing and cancelling, its PDF and the copy emailed to the carrier — not a delivery note, an invoice or a VeriFactu record |
+| 📦 **Catalog**          | Contacts that are customers, suppliers or both; products with variants, presentations and stock; supplier offers; price lists; numbering series; taxes                                                                                                      |
+| 🏛️ **Compliance**       | VeriFactu records, events and certificates; FacturaE e-invoices to public administrations through FACe; Modelo 303, 347 and 130                                                                                                                             |
+| ⏱️ **Team**             | Employees, work schedules, the working-time register required by RD-ley 8/2019, absences, presence and holidays                                                                                                                                             |
+| ✅ **Tasks & projects** | Projects with board columns and custom fields; tasks with assignees, labels, comments, attachments and subtasks; timers and time entries you can bill on an invoice; the agenda and notifications                                                           |
+| ⚙️ **Automation**       | Webhooks and events, a rule engine with dry runs, WooCommerce and Shopify stores, Stripe auto-invoicing                                                                                                                                                     |
+| 🏢 **Advisors**         | Managed companies for gestorías, API keys, email and request logs                                                                                                                                                                                           |
 
 Every tool, its domain and the permission it needs: **[docs.factuarea.com/mcp/tools](https://docs.factuarea.com/mcp/tools)**.
 
