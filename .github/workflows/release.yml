@@ -78,14 +78,48 @@ jobs:
           # has a Trusted Publisher configured on npmjs.com.
           NPM_CONFIG_PROVENANCE: 'true'
 
+      # A release can reach npm and still miss the registry: npm can take minutes to
+      # serve a version it has just accepted, and the registry rejects a version it
+      # cannot read there. So the announcement does not depend only on this run's
+      # publish: every run checks the version of the commit it runs on and announces
+      # it when npm has it and the registry does not. A missed announcement is then
+      # completed by the next push to main or by running this workflow by hand.
+      - name: Check the version against the MCP Registry
+        id: registry
+        env:
+          PUBLISHED: ${{ steps.changesets.outputs.published }}
+        run: |
+          # In version mode changesets/action leaves the checkout on the Version
+          # Packages branch, whose version is not on npm yet: go back to this commit.
+          git checkout --quiet --detach "$GITHUB_SHA"
+          version=$(node -p "require('./server.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          registry=$(curl -s -o /dev/null -w '%{http_code}' \
+            "https://registry.modelcontextprotocol.io/v0/servers/com.factuarea%2Fmcp/versions/$version")
+          npm=$(curl -s -o /dev/null -w '%{http_code}' "https://registry.npmjs.org/@factuarea%2Fmcp/$version")
+          echo "com.factuarea/mcp $version: MCP Registry $registry, npm $npm."
+          if [ "$PUBLISHED" = true ] || { [ "$registry" = 404 ] && [ "$npm" = 200 ]; }; then
+            echo "announce=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Announce the release to the MCP Registry
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.registry.outputs.announce == 'true'
         env:
           MCP_REGISTRY_PRIVATE_KEY: ${{ secrets.MCP_REGISTRY_PRIVATE_KEY }}
+          VERSION: ${{ steps.registry.outputs.version }}
         run: |
+          # The registry checks the `mcpName` of the npm version it is told about, so
+          # wait until npm serves that version, up to 15 minutes.
+          for attempt in $(seq 1 30); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' "https://registry.npmjs.org/@factuarea%2Fmcp/$VERSION")
+            if [ "$status" = 200 ]; then break; fi
+            if [ "$attempt" = 30 ]; then
+              echo "::error::npm does not serve @factuarea/mcp@$VERSION after 15 minutes."
+              exit 1
+            fi
+            sleep 30
+          done
           mcp-publisher login dns --domain factuarea.com --private-key "$MCP_REGISTRY_PRIVATE_KEY"
-          # The registry checks the `mcpName` of the npm version it is told about,
-          # and a version npm has just accepted can take a moment to be readable.
           for attempt in 1 2 3 4 5; do
             if mcp-publisher publish; then exit 0; fi
             echo "Registry publish failed (attempt $attempt); retrying…"
@@ -99,4 +133,4 @@ jobs:
           echo "::error::The release failed. If npm rejected the publish, the npm Trusted Publisher"
           echo "::error::for @factuarea/mcp is missing (owner factuarea, repo factuarea-mcp, workflow release.yml)."
           echo "::error::If only the registry step failed, npm already has the version: fix the DNS key or the"
-          echo "::error::MCP_REGISTRY_PRIVATE_KEY secret and run 'mcp-publisher publish' by hand. See CONTRIBUTING.md."
+          echo "::error::MCP_REGISTRY_PRIVATE_KEY secret if needed and run this workflow again. See CONTRIBUTING.md."
