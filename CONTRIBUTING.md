@@ -101,9 +101,11 @@ Releases are automated by [`.github/workflows/release.yml`](.github/workflows/re
   repository secret `MCP_REGISTRY_PRIVATE_KEY`. The record goes on the apex, not on a
   subdomain, and a stale record must be removed when the key rotates.
 
-If a release publishes to npm but the registry step fails, the version is already on npm:
-fix the key or the secret and run `mcp-publisher login dns …` and `mcp-publisher publish`
-from a checkout of the release commit.
+If a release publishes to npm but the registry step fails, the version is already on npm.
+Every run of the release workflow on `main` announces the version in `server.json` when
+npm has it and the registry does not: fix the key or the secret if that was the cause,
+then run the workflow by hand (**Actions → Release → Run workflow**) or let the next push
+to `main` do it.
 
 ## Code of conduct
 
