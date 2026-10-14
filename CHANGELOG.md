@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+### Patch Changes
+
+- [#10](https://github.com/factuarea/factuarea-mcp/pull/10) [`495cc98`](https://github.com/factuarea/factuarea-mcp/commit/495cc984089e3f4d5ab0cffbc3d403f446f149e1) Thanks [@Chelu97](https://github.com/Chelu97)! - Update the README in English and Spanish for the new transport control document (DeCA) tools: the domain count and a "Transport" row in "What it covers".
+
 ## 0.1.1
 
 ### Patch Changes
