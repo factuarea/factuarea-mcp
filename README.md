@@ -23,7 +23,7 @@
   <a href="https://www.npmjs.com/package/@factuarea/mcp"><img src="https://img.shields.io/npm/v/@factuarea/mcp?color=465FFF&label=npm" alt="npm"></a>
   <a href="https://github.com/factuarea/factuarea-mcp/actions/workflows/ci.yml"><img src="https://github.com/factuarea/factuarea-mcp/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://registry.modelcontextprotocol.io/v0/servers?search=com.factuarea/mcp"><img src="https://img.shields.io/badge/MCP_Registry-com.factuarea%2Fmcp-465FFF" alt="MCP Registry"></a>
-  <a href="https://docs.factuarea.com/mcp/tools"><img src="https://img.shields.io/badge/tools-550%2B-465FFF" alt="550+ tools"></a>
+  <a href="https://docs.factuarea.com/mcp/tools"><img src="https://img.shields.io/badge/tools-650%2B-465FFF" alt="650+ tools"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-465FFF" alt="MIT license"></a>
 </p>
 
@@ -35,7 +35,7 @@
 ---
 
 <p align="center">
-  <strong>550+</strong> tools · <strong>37</strong> domains · <strong>9</strong> fiscal guardrails · <strong>5</strong> guided workflows · <strong>live</strong> and <strong>sandbox</strong> environments
+  <strong>650+</strong> tools · <strong>41</strong> domains · <strong>9</strong> fiscal guardrails · <strong>5</strong> guided workflows · <strong>live</strong> and <strong>sandbox</strong> environments
 </p>
 
 [Factuarea](https://factuarea.com) is an invoicing and management platform for businesses
@@ -132,20 +132,23 @@ from CI with [npm provenance](https://docs.npmjs.com/generating-provenance-state
 > _"Who on the team hasn't clocked in today?"_
 >
 > _"Create a task in project DEV for tomorrow and assign it to Ana."_
+>
+> _"Use the new template with our logo on every quote we send to Talleres Ruiz."_
 
 ## What it covers
 
-|                         |                                                                                                                                                                                                                                                             |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🧾 **Sales**            | Invoices from draft to paid — sending, scheduling, reminders, payments, voiding and rectificativas — plus quotes, pro-formas, signed delivery notes and recurring invoices                                                                                  |
-| 📥 **Purchases**        | Supplier invoices with attachments, payments, overdue and pending lists                                                                                                                                                                                     |
-| 🚚 **Transport**        | DeCA, the electronic control document for road freight: drafts (also from delivery notes), issuing, changes during the service, closing and cancelling, its PDF and the copy emailed to the carrier — not a delivery note, an invoice or a VeriFactu record |
-| 📦 **Catalog**          | Contacts that are customers, suppliers or both; products with variants, presentations and stock; supplier offers; price lists; numbering series; taxes                                                                                                      |
-| 🏛️ **Compliance**       | VeriFactu records, events and certificates; FacturaE e-invoices to public administrations through FACe; Modelo 303, 347 and 130                                                                                                                             |
-| ⏱️ **Team**             | Employees, work schedules, the working-time register required by RD-ley 8/2019, absences, presence and holidays                                                                                                                                             |
-| ✅ **Tasks & projects** | Projects with board columns and custom fields; tasks with assignees, labels, comments, attachments and subtasks; timers and time entries you can bill on an invoice; the agenda and notifications                                                           |
-| ⚙️ **Automation**       | Webhooks and events, a rule engine with dry runs, WooCommerce and Shopify stores, Stripe auto-invoicing                                                                                                                                                     |
-| 🏢 **Advisors**         | Managed companies for gestorías, API keys, email and request logs                                                                                                                                                                                           |
+|                         |                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧾 **Sales**            | Invoices from draft to paid — sending, scheduling, reminders, payments, voiding and rectificativas — plus quotes, pro-formas, signed delivery notes and recurring invoices                                                                                                                                                                                                                  |
+| 🎨 **Document design**  | A library of PDF templates and brand identities, versioned by revision, with your own logos and defaults for the company, each document type, series or contact; the template of each invoice, quote, pro-forma and delivery note and its audited visual revisions; previews, retained PDFs you can prepare, render and verify, and public links that share the exact version you published |
+| 📥 **Purchases**        | Supplier invoices with attachments, payments, overdue and pending lists                                                                                                                                                                                                                                                                                                                     |
+| 🚚 **Transport**        | DeCA, the electronic control document for road freight: drafts (also from delivery notes), issuing, changes during the service, closing and cancelling, its PDF and the copy emailed to the carrier — not a delivery note, an invoice or a VeriFactu record                                                                                                                                 |
+| 📦 **Catalog**          | Contacts that are customers, suppliers or both; products with variants, presentations and stock; supplier offers; price lists; numbering series; taxes                                                                                                                                                                                                                                      |
+| 🏛️ **Compliance**       | VeriFactu records, events and certificates; FacturaE e-invoices to public administrations through FACe; Modelo 303, 347 and 130                                                                                                                                                                                                                                                             |
+| ⏱️ **Team**             | Employees, work schedules, the working-time register required by RD-ley 8/2019, absences, presence and holidays                                                                                                                                                                                                                                                                             |
+| ✅ **Tasks & projects** | Projects with board columns and custom fields; tasks with assignees, labels, comments, attachments and subtasks; timers and time entries you can bill on an invoice; the agenda and notifications                                                                                                                                                                                           |
+| ⚙️ **Automation**       | Webhooks and events, a rule engine with dry runs, WooCommerce and Shopify stores, Stripe auto-invoicing                                                                                                                                                                                                                                                                                     |
+| 🏢 **Advisors**         | Managed companies for gestorías, API keys, email and request logs                                                                                                                                                                                                                                                                                                                           |
 
 Every tool, its domain and the permission it needs: **[docs.factuarea.com/mcp/tools](https://docs.factuarea.com/mcp/tools)**.
 

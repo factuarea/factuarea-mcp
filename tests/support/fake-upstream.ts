@@ -10,6 +10,7 @@ import {
   ListResourceTemplatesRequestSchema,
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
+  type CallToolResult,
   type ServerCapabilities,
 } from '@modelcontextprotocol/sdk/types.js';
 
@@ -24,6 +25,24 @@ export const GUARDRAIL_ERROR = {
     subcode: 'anular-o-rectificar',
     guardrail_uri: 'factuarea://guardrails/anular-o-rectificar',
     rule_id: 'BR-INV-002',
+  },
+};
+
+/**
+ * A domain error raised while a tool runs: the hosted server answers with a result flagged
+ * `isError`, the message as text and the REST error contract under `_meta`.
+ */
+export const DUPLICATE_CONTACT_RESULT: CallToolResult = {
+  content: [{ type: 'text', text: 'Ya existe un contacto con esa identidad fiscal en la empresa.' }],
+  isError: true,
+  _meta: {
+    'com.factuarea/error': {
+      http_status: 409,
+      code: 'resource_already_exists',
+      hint: 'Ya existe un contacto con esa identidad fiscal en la empresa.',
+      subcode: 'tax_id_already_exists',
+      details: { existing_resource_id: '0199e3a0-4c1b-7d2e-9f30-1a2b3c4d5e6f' },
+    },
   },
 };
 
@@ -163,6 +182,8 @@ function buildServer(capabilities: ServerCapabilities, instructions: string | un
           });
         case 'send_invoice':
           return { content: [{ type: 'text', text: 'El destinatario no tiene email.' }], isError: true };
+        case 'create_contact':
+          return DUPLICATE_CONTACT_RESULT;
         case 'export_report': {
           const token = request.params._meta?.progressToken;
           if (token !== undefined) {
