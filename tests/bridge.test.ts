@@ -8,6 +8,7 @@ import type { BridgeConfig } from '../src/config.js';
 import { VERSION } from '../src/defaults.js';
 import {
   DELETE_INVOICE_TOOL,
+  DUPLICATE_CONTACT_RESULT,
   GUARDRAIL_ERROR,
   SEARCH_INVOICES_TOOL,
   VALID_KEY,
@@ -119,6 +120,15 @@ describe('relaying to the hosted server', () => {
 
     expect(result.isError).toBe(true);
     expect(result.content).toEqual([{ type: 'text', text: 'El destinatario no tiene email.' }]);
+  });
+
+  it('keeps the error contract of a failed tool call in the result’s _meta', async () => {
+    const fake = await upstream();
+    const { client } = await connect({ url: fake.url });
+
+    const result = await client.callTool({ name: 'create_contact', arguments: { tax_id: 'B00000000' } });
+
+    expect(result).toEqual(DUPLICATE_CONTACT_RESULT);
   });
 
   it('relays progress notifications under the local client’s own token', async () => {
