@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3
+
+### Patch Changes
+
+- [#15](https://github.com/factuarea/factuarea-mcp/pull/15) [`f41622f`](https://github.com/factuarea/factuarea-mcp/commit/f41622ff036dfdbd521d8cc1c68e734e50034b0e) Thanks [@Chelu97](https://github.com/Chelu97)! - Update the README in English and Spanish for the new PDF template and document design tools: the tool and domain counts, a "Document design" row in "What it covers" and an example request.
+
 ## 0.1.2
 
 ### Patch Changes
